@@ -13,6 +13,7 @@ CLIENT_ID = "client1"
 
 class ClientGUI:
     def __init__(self, root):
+
         self.root = root
         self.root.title(f"Chat Client - {CLIENT_ID}")
 
@@ -30,12 +31,18 @@ class ClientGUI:
         self.client = None
 
     def connect(self):
+        """ 
+        Connect to server
+        """
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(ADDR)
         self.connect_button.config(state=tk.DISABLED)
         threading.Thread(target=self.receive_messages).start()
 
     def send_message(self, event=None):
+        """
+        Send message to server
+        """
         msg = self.msg_entry.get()
         if msg:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -47,6 +54,9 @@ class ClientGUI:
                 self.root.quit()
 
     def receive_messages(self):
+        """ 
+        Receive messages from server
+        """
         while True:
             try:
                 msg = self.client.recv(1024).decode(FORMAT)

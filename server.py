@@ -19,7 +19,11 @@ clients_lock = threading.Lock()
 client_count = 0
 
 def broadcast(message, _client=None):
-    """ Broadcast message to all clients """
+    """ Broadcast message to all clients
+    Args:
+        message (bytes): message to broadcast
+        _client (socket): client to exclude from broadcast (default is None) 
+      """
     with clients_lock:
         for client in clients:
             if client != _client:
@@ -30,7 +34,8 @@ def broadcast(message, _client=None):
                     clients.remove(client)
 
 def handle_client(conn, addr):
-    global client_count
+    """ Handle client connection """ 
+    global client_count  # initialize client count
     with clients_lock:
         client_count += 1
         client_id = f"client{client_count}"
@@ -51,8 +56,7 @@ def handle_client(conn, addr):
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             message = f"[{timestamp}] [{client_id}] {msg}".encode(FORMAT)
             logging.info(message.decode(FORMAT))
-            broadcast(message, conn)
-
+            broadcast(message, conn) # broadcast message to all clients except the sender
     except Exception as e:
         logging.error(f"[ERROR] {e}")
 
@@ -63,10 +67,12 @@ def handle_client(conn, addr):
 
 def server_broadcast():
     while True:
-        msg = input("send meessage to all clients: ")
+        msg = input("send meessage to all clients: ") 
+        # server input message to broadcast which received by all clients
         if msg:
-            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            message = f"[{timestamp}] [SERVER] {msg}".encode(FORMAT)
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+            message = f"[{timestamp}] [SERVER] {msg}".encode(FORMAT)  
+            # message format with timestamp and server as sender
             logging.info(message.decode(FORMAT))
             broadcast(message)
 
